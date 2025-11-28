@@ -13,7 +13,28 @@ export function createClient() {
     )
   }
   
-  // Let Supabase SSR handle cookies automatically - it knows the right way to set them
-  return createBrowserClient<Database>(url, anonKey)
+  // Provide cookie handlers to use cookies instead of localStorage
+  // This is required for middleware to read the session
+  // Check if we're in the browser before accessing document
+  return createBrowserClient<Database>(url, anonKey, {
+    cookies: {
+      getAll() {
+        if (typeof document === 'undefined') {
+          return []
+        }
+        return document.cookie.split('; ').map(cookie => {
+          const [name, ...rest] = cookie.split('=')
+          return { name, value: rest.join('=') }
+        })
+      },
+      setAll(cookiesToSet) {
+        if (typeof document === 'undefined') {
+          return
+        }
+        cookiesToSet.forEach(({ name, value, options }) => {
+          document.cookie = `${name}=${value}; path=${options?.path || '/'}; ${options?.maxAge ? `max-age=${options.maxAge};` : ''} ${options?.sameSite ? `samesite=${options.sameSite};` : 'samesite=lax;'} ${options?.secure ? 'secure;' : ''}`
+        })
+      },
+    },
+  })
 }
-

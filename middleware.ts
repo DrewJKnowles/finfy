@@ -2,8 +2,10 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
   })
 
   const supabase = createServerClient(
@@ -15,46 +17,19 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({
-            request,
+          cookiesToSet.forEach(({ name, value, options }) => {
+            request.cookies.set(name, value)
+            response.cookies.set(name, value, options)
           })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
         },
       },
     }
   )
 
-  // Log cookies for debugging
-  if (process.env.NODE_ENV === 'development') {
-    const allCookies = request.cookies.getAll()
-    const authCookies = allCookies.filter(c => 
-      c.name.includes('sb-') || c.name.includes('supabase')
-    )
-    console.log('🍪 Middleware cookies:', {
-      total: allCookies.length,
-      authCookies: authCookies.map(c => ({ name: c.name, hasValue: !!c.value })),
-    })
-  }
-
   // Refresh session if expired - required for Server Components
-  // This also ensures cookies are properly read
   const {
     data: { user },
-    error: authError,
   } = await supabase.auth.getUser()
-
-  // Log for debugging (remove in production)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🔍 Middleware check:', {
-      path: request.nextUrl.pathname,
-      hasUser: !!user,
-      userId: user?.id,
-      authError: authError?.message,
-    })
-  }
 
   const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
   const isProtectedRoute = 
@@ -65,21 +40,15 @@ export async function middleware(request: NextRequest) {
 
   // Redirect authenticated users away from auth pages
   if (isAuthPage && user) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('✅ User authenticated, redirecting from auth page to dashboard')
-    }
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   // Redirect unauthenticated users from protected routes
   if (isProtectedRoute && !user) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('❌ No user found, redirecting to login')
-    }
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
-  return supabaseResponse
+  return response
 }
 
 export const config = {
@@ -94,4 +63,3 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
-
