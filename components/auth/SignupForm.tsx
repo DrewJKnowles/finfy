@@ -33,18 +33,31 @@ export function SignupForm() {
     setLoading(true)
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
       })
 
-      if (error) throw error
+      if (error) {
+        console.error('Signup error:', error)
+        throw error
+      }
 
-      router.push('/dashboard')
-      router.refresh()
+      if (authData.session) {
+        // Wait a moment for cookies to be set and session to be established
+        await new Promise(resolve => setTimeout(resolve, 200))
+        // Force a hard navigation to ensure middleware runs
+        window.location.href = '/dashboard'
+      } else if (authData.user) {
+        // User created but needs email confirmation
+        setError('Please check your email to confirm your account')
+        setLoading(false)
+      } else {
+        throw new Error('Failed to create account. Please try again.')
+      }
     } catch (err: any) {
+      console.error('Signup error:', err)
       setError(err.message || 'Failed to sign up')
-    } finally {
       setLoading(false)
     }
   }
