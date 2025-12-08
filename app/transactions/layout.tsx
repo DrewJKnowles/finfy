@@ -10,3 +10,4 @@ export default async function TransactionsLayout({
   return <AppLayout>{children}</AppLayout>
 }
 
+

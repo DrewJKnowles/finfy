@@ -71,3 +71,4 @@ export function DashboardChart({ data }: { data: ChartData[] }) {
   )
 }
 
+

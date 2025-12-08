@@ -15,3 +15,4 @@ export function checkSupabaseEnv() {
   return { url, anonKey }
 }
 
+

@@ -36,7 +36,8 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/dashboard') ||
     request.nextUrl.pathname.startsWith('/accounts') ||
     request.nextUrl.pathname.startsWith('/transactions') ||
-    request.nextUrl.pathname.startsWith('/budgets')
+    request.nextUrl.pathname.startsWith('/budgets') ||
+    request.nextUrl.pathname.startsWith('/statements')
 
   // Redirect authenticated users away from auth pages
   if (isAuthPage && user) {

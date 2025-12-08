@@ -163,3 +163,4 @@ export function BudgetsTable({ budgets }: { budgets: Budget[] }) {
   )
 }
 
+

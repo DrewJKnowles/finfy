@@ -37,3 +37,4 @@ export type AccountInput = z.infer<typeof accountSchema>
 export type TransactionInput = z.infer<typeof transactionSchema>
 export type BudgetInput = z.infer<typeof budgetSchema>
 
+

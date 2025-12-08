@@ -24,6 +24,7 @@ import {
   Receipt as ReceiptIcon,
   Savings as SavingsIcon,
   Logout as LogoutIcon,
+  Upload as UploadIcon,
 } from '@mui/icons-material'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -36,6 +37,7 @@ const menuItems = [
   { text: 'Accounts', icon: <AccountBalanceIcon />, href: '/accounts' },
   { text: 'Transactions', icon: <ReceiptIcon />, href: '/transactions' },
   { text: 'Budgets', icon: <SavingsIcon />, href: '/budgets' },
+  { text: 'Import Statements', icon: <UploadIcon />, href: '/statements' },
 ]
 
 export function AppLayout({ children }: { children: ReactNode }) {
@@ -158,4 +160,5 @@ export function AppLayout({ children }: { children: ReactNode }) {
     </Box>
   )
 }
+
 

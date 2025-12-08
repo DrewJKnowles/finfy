@@ -17,8 +17,10 @@
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.39.0",
     "date-fns": "^3.0.6",
+    "pdf-parse": "^1.1.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.49.2",
     "recharts": "^2.10.3",
     "zod": "^3.22.4"
